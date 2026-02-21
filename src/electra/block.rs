@@ -207,8 +207,8 @@ paste! {
             pub fn block_hash_tree_root(
                 &self,
                 py: pyo3::Python<'_>,
-            ) -> pyo3::PyResult<String> {
-                Ok(py.detach(|| format_hash_tree_root(&self.inner.block.hash_tree_root())))
+            ) -> String {
+                py.detach(|| format_hash_tree_root(&self.inner.block.hash_tree_root()))
             }
         }
     );
@@ -246,8 +246,8 @@ paste! {
             pub fn block_hash_tree_root(
                 &self,
                 py: pyo3::Python<'_>,
-            ) -> pyo3::PyResult<String> {
-                Ok(py.detach(|| format_hash_tree_root(&self.inner.block.hash_tree_root())))
+            ) -> String {
+                py.detach(|| format_hash_tree_root(&self.inner.block.hash_tree_root()))
             }
         }
     );
@@ -285,8 +285,8 @@ paste! {
             pub fn block_hash_tree_root(
                 &self,
                 py: pyo3::Python<'_>,
-            ) -> pyo3::PyResult<String> {
-                Ok(py.detach(|| format_hash_tree_root(&self.inner.block.hash_tree_root())))
+            ) -> String {
+                py.detach(|| format_hash_tree_root(&self.inner.block.hash_tree_root()))
             }
         }
     );
@@ -338,8 +338,8 @@ paste! {
             pub fn block_hash_tree_root(
                 &self,
                 py: pyo3::Python<'_>,
-            ) -> pyo3::PyResult<String> {
-                Ok(py.detach(|| format_hash_tree_root(&self.inner.hash_tree_root())))
+            ) -> String {
+                py.detach(|| format_hash_tree_root(&self.inner.hash_tree_root()))
             }
         }
     );
@@ -373,8 +373,8 @@ paste! {
             pub fn block_hash_tree_root(
                 &self,
                 py: pyo3::Python<'_>,
-            ) -> pyo3::PyResult<String> {
-                Ok(py.detach(|| format_hash_tree_root(&self.inner.hash_tree_root())))
+            ) -> String {
+                py.detach(|| format_hash_tree_root(&self.inner.hash_tree_root()))
             }
         }
     );
@@ -408,8 +408,8 @@ paste! {
             pub fn block_hash_tree_root(
                 &self,
                 py: pyo3::Python<'_>,
-            ) -> pyo3::PyResult<String> {
-                Ok(py.detach(|| format_hash_tree_root(&self.inner.hash_tree_root())))
+            ) -> String {
+                py.detach(|| format_hash_tree_root(&self.inner.hash_tree_root()))
             }
         }
     );
