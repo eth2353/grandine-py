@@ -43,3 +43,17 @@ ssz_bytes = block.to_ssz()
 # Sign a block
 signed_block = block.sign(signature_hex)
 ```
+
+## Testing
+
+Run the test suite using `uv`:
+
+```bash
+uv run pytest
+```
+
+For verbose output with test names:
+
+```bash
+uv run pytest -v
+```
