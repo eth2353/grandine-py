@@ -8,17 +8,22 @@ This package provides Python bindings for SSZ serialization/deserialization of E
 
 ## Supported Presets
 
-- **Mainnet** - Ethereum mainnet configuration
-- **Minimal** - Minimal preset for testing
-- **Gnosis** - Gnosis Chain configuration
+- [Mainnet](https://github.com/ethereum/consensus-specs/tree/master/presets/mainnet) - Ethereum mainnet, Hoodi testnet
+- [Gnosis](https://github.com/gnosischain/specs/tree/master/consensus/preset/gnosis) - Gnosis Chain, Chiado testnet
+- [Minimal](https://github.com/ethereum/consensus-specs/tree/master/presets/minimal) - devnets
 
 ## Installation
 
-Requires Python 3.12+ and Rust toolchain.
+### Development
 
 ```bash
-pip install maturin
-maturin develop
+uvx maturin develop
+```
+
+### Other projects
+
+```bash
+uv add git+https://github.com/eth2353/grandine-py --rev v0.1.0
 ```
 
 ## Usage
