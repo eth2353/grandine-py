@@ -55,15 +55,17 @@ class TestElectraSignedBeaconBlockMainnetJSON:
         """Test JSON decoding and re-encoding preserves the block data."""
         data_only = {"data": mainnet_block_json_dict["data"]}
         json_bytes = json.dumps(data_only).encode()
-        
+
         block = ElectraSignedBeaconBlockMainnet.from_json(json_bytes)
         re_encoded = block.to_json()
-        
+
         # Parse and compare the actual block data
+        # Note: from_json expects {"data": ...} wrapper, but to_json returns
+        # just the block data without the wrapper
         original_data = data_only["data"]
         re_decoded = json.loads(re_encoded)
-        assert re_decoded["data"]["message"]["slot"] == original_data["message"]["slot"]
-        assert re_decoded["data"]["message"]["proposer_index"] == original_data["message"]["proposer_index"]
+        assert re_decoded["message"]["slot"] == original_data["message"]["slot"]
+        assert re_decoded["message"]["proposer_index"] == original_data["message"]["proposer_index"]
 
     def test_to_json_returns_bytes(
         self,
