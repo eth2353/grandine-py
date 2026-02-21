@@ -204,8 +204,11 @@ paste! {
                 Ok([<PySignedBeaconBlockContentsMainnet>] { inner: signed })
             }
 
-            pub fn block_hash_tree_root(&self) -> String {
-                format_hash_tree_root(&self.inner.block.hash_tree_root())
+            pub fn block_hash_tree_root(
+                &self,
+                py: pyo3::Python<'_>,
+            ) -> pyo3::PyResult<String> {
+                Ok(py.detach(|| format_hash_tree_root(&self.inner.block.hash_tree_root())))
             }
         }
     );
@@ -240,8 +243,11 @@ paste! {
                 Ok([<PySignedBeaconBlockContentsGnosis>] { inner: signed })
             }
 
-            pub fn block_hash_tree_root(&self) -> String {
-                format_hash_tree_root(&self.inner.block.hash_tree_root())
+            pub fn block_hash_tree_root(
+                &self,
+                py: pyo3::Python<'_>,
+            ) -> pyo3::PyResult<String> {
+                Ok(py.detach(|| format_hash_tree_root(&self.inner.block.hash_tree_root())))
             }
         }
     );
@@ -276,8 +282,11 @@ paste! {
                 Ok([<PySignedBeaconBlockContentsMinimal>] { inner: signed })
             }
 
-            pub fn block_hash_tree_root(&self) -> String {
-                format_hash_tree_root(&self.inner.block.hash_tree_root())
+            pub fn block_hash_tree_root(
+                &self,
+                py: pyo3::Python<'_>,
+            ) -> pyo3::PyResult<String> {
+                Ok(py.detach(|| format_hash_tree_root(&self.inner.block.hash_tree_root())))
             }
         }
     );
@@ -326,8 +335,11 @@ paste! {
                 Ok([<PySignedBlindedBeaconBlockMainnet>] { inner: signed })
             }
 
-            pub fn block_hash_tree_root(&self) -> String {
-                format_hash_tree_root(&self.inner.hash_tree_root())
+            pub fn block_hash_tree_root(
+                &self,
+                py: pyo3::Python<'_>,
+            ) -> pyo3::PyResult<String> {
+                Ok(py.detach(|| format_hash_tree_root(&self.inner.hash_tree_root())))
             }
         }
     );
@@ -358,8 +370,11 @@ paste! {
                 Ok([<PySignedBlindedBeaconBlockGnosis>] { inner: signed })
             }
 
-            pub fn block_hash_tree_root(&self) -> String {
-                format_hash_tree_root(&self.inner.hash_tree_root())
+            pub fn block_hash_tree_root(
+                &self,
+                py: pyo3::Python<'_>,
+            ) -> pyo3::PyResult<String> {
+                Ok(py.detach(|| format_hash_tree_root(&self.inner.hash_tree_root())))
             }
         }
     );
@@ -390,8 +405,11 @@ paste! {
                 Ok([<PySignedBlindedBeaconBlockMinimal>] { inner: signed })
             }
 
-            pub fn block_hash_tree_root(&self) -> String {
-                format_hash_tree_root(&self.inner.hash_tree_root())
+            pub fn block_hash_tree_root(
+                &self,
+                py: pyo3::Python<'_>,
+            ) -> pyo3::PyResult<String> {
+                Ok(py.detach(|| format_hash_tree_root(&self.inner.hash_tree_root())))
             }
         }
     );
