@@ -73,9 +73,12 @@ macro_rules! define_ssz_pyclass_for_preset {
             /// # Errors
             /// Returns `PyValueError` if deserialization fails.
             pub fn from_ssz(
+                py: pyo3::Python<'_>,
                 b: &pyo3::Bound<'_, pyo3::types::PyBytes>,
             ) -> pyo3::PyResult<Self> {
-                let inner: $rust_ty = $crate::decode_ssz(b.as_bytes())
+                let bytes = b.as_bytes().to_vec();
+                let inner: $rust_ty = py
+                    .detach(|| $crate::decode_ssz(&bytes))
                     .map_err(|e| pyo3::exceptions::PyValueError::new_err(e))?;
                 Ok(Self { inner })
             }
@@ -88,6 +91,7 @@ macro_rules! define_ssz_pyclass_for_preset {
             /// # Errors
             /// Returns `PyValueError` if deserialization fails.
             pub fn from_json(
+                py: pyo3::Python<'_>,
                 b: &pyo3::Bound<'_, pyo3::types::PyBytes>,
             ) -> pyo3::PyResult<Self>
             where
@@ -98,7 +102,9 @@ macro_rules! define_ssz_pyclass_for_preset {
                     data: T,
                 }
 
-                let env: Envelope<$rust_ty> = serde_json::from_slice(b.as_bytes())
+                let bytes = b.as_bytes().to_vec();
+                let env: Envelope<$rust_ty> = py
+                    .detach(|| serde_json::from_slice(&bytes))
                     .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
 
                 Ok(Self { inner: env.data })
@@ -112,7 +118,9 @@ macro_rules! define_ssz_pyclass_for_preset {
                 &self,
                 py: pyo3::Python<'_>,
             ) -> pyo3::PyResult<pyo3::Py<pyo3::types::PyBytes>> {
-                let out = $crate::encode_ssz(&self.inner)
+                let inner_ref = &self.inner;
+                let out: Vec<u8> = py
+                    .detach(|| $crate::encode_ssz(inner_ref))
                     .map_err(|e| pyo3::exceptions::PyValueError::new_err(e))?;
                 Ok(pyo3::types::PyBytes::new(py, &out).into())
             }
@@ -128,7 +136,9 @@ macro_rules! define_ssz_pyclass_for_preset {
             where
                 $rust_ty: serde::Serialize,
             {
-                let out = serde_json::to_vec(&self.inner)
+                let inner_ref = &self.inner;
+                let out: Vec<u8> = py
+                    .detach(|| serde_json::to_vec(inner_ref))
                     .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
                 Ok(pyo3::types::PyBytes::new(py, &out).into())
             }
