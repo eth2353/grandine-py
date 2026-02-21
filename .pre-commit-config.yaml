@@ -1,0 +1,39 @@
+default_language_version:
+    python: python3.12
+
+repos:
+  # Basic file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+
+  # Rust hooks
+  - repo: https://github.com/bnjbvr/cargo-machete
+    rev: v0.9.1
+    hooks:
+    - id: cargo-machete
+
+  - repo: local
+    hooks:
+    - id: cargo-fmt
+      name: cargo fmt
+      language: system
+      entry: cargo fmt --all --check
+      pass_filenames: false
+
+    - id: cargo-check
+      name: cargo check
+      language: system
+      entry: cargo check
+      pass_filenames: false
+
+    - id: cargo-clippy
+      name: cargo clippy
+      language: system
+      entry: cargo clippy --all-targets --all-features -- -D warnings -W clippy::pedantic
+      pass_filenames: false
