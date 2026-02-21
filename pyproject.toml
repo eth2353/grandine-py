@@ -7,3 +7,8 @@ name = "grandine-py"
 version = "0.1.0"
 description = "Python bindings for Grandine crates"
 requires-python = ">=3.12"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
