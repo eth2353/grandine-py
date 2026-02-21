@@ -140,7 +140,7 @@ def extract_rust_types(rust_content: str, preset_name: str) -> dict[str, str]:
     """Extract type definitions from Rust preset file."""
     types = {}
 
-    if preset_name ***REMOVED*** "gnosis":
+    if preset_name == "gnosis":
         # For Gnosis, extract from impl Preset for Gnosis
         pattern = r"type\s+(\w+)\s*=\s*(U\d+);"
         for match in re.finditer(pattern, rust_content):
@@ -155,7 +155,7 @@ def extract_rust_types(rust_content: str, preset_name: str) -> dict[str, str]:
             impl_content = impl_match.group(1)
 
             # First, handle delegate_preset_items! macro (Minimal delegates to Mainnet)
-            if preset_name ***REMOVED*** "minimal":
+            if preset_name == "minimal":
                 delegate_pattern = (
                     r"delegate_preset_items!\s*\{\s*super\s+Mainnet;([^}]+)\}"
                 )
@@ -175,7 +175,7 @@ def extract_rust_types(rust_content: str, preset_name: str) -> dict[str, str]:
                 types[match.group(1)] = match.group(2)
 
             # For Minimal, resolve delegated types from Mainnet
-            if preset_name ***REMOVED*** "minimal":
+            if preset_name == "minimal":
                 mainnet_types = {}
                 mainnet_impl_pattern = r"impl\s+Preset\s+for\s+Mainnet\s*\{(.*?)\n\}"
                 mainnet_match = re.search(mainnet_impl_pattern, rust_content, re.DOTALL)
@@ -187,7 +187,7 @@ def extract_rust_types(rust_content: str, preset_name: str) -> dict[str, str]:
                 # Resolve delegated types
                 for type_name, type_value in list(types.items()):
                     if (
-                        type_value ***REMOVED*** "DELEGATED_TO_MAINNET"
+                        type_value == "DELEGATED_TO_MAINNET"
                         and type_name in mainnet_types
                     ):
                         types[type_name] = mainnet_types[type_name]
@@ -255,7 +255,7 @@ def extract_rust_consts(rust_content: str, preset_name: str) -> dict[str, int]:
     """Extract const definitions from Rust preset file."""
     consts = {}
 
-    if preset_name ***REMOVED*** "gnosis":
+    if preset_name == "gnosis":
         content_to_search = rust_content
         # Match pattern like "const BASE_REWARD_FACTOR: u64 = 25;"
         pattern = r"const\s+(\w+)\s*:\s*(?:NonZeroU64|u64|Gwei|usize|u8)\s*=\s*(.+?);"
@@ -293,11 +293,11 @@ def extract_rust_consts(rust_content: str, preset_name: str) -> dict[str, int]:
         trait_defaults = extract_trait_defaults(rust_content)
 
         # For Mainnet, it uses all trait defaults
-        if preset_name ***REMOVED*** "mainnet":
+        if preset_name == "mainnet":
             consts = trait_defaults.copy()
 
         # For Minimal, get the impl block overrides
-        elif preset_name ***REMOVED*** "minimal":
+        elif preset_name == "minimal":
             consts = trait_defaults.copy()  # Start with defaults
 
             # Find Minimal impl block
@@ -348,7 +348,7 @@ def load_yaml_values(presets_dir: Path) -> dict[str, int]:
     values = {}
 
     # Use all YAML files in the directory
-    yaml_files = [f for f in presets_dir.iterdir() if f.suffix ***REMOVED*** ".yaml"]
+    yaml_files = [f for f in presets_dir.iterdir() if f.suffix == ".yaml"]
 
     for filepath in yaml_files:
         with filepath.open() as f:
@@ -416,13 +416,13 @@ def verify_preset(preset_name: str, config: dict) -> tuple[int, list[Mismatch]]:
 
     for rust_name, rust_typenum in rust_types.items():
         # Handle computed parameters
-        if rust_name ***REMOVED*** "EpochsPerHistoricalRoot":
+        if rust_name == "EpochsPerHistoricalRoot":
             yaml_val = (
                 yaml_values["SLOTS_PER_HISTORICAL_ROOT"]
                 // yaml_values["SLOTS_PER_EPOCH"]
             )
             source = "computed"
-        elif rust_name ***REMOVED*** "CellsPerExtBlob":
+        elif rust_name == "CellsPerExtBlob":
             yaml_val = (
                 yaml_values["FIELD_ELEMENTS_PER_EXT_BLOB"]
                 // yaml_values["FIELD_ELEMENTS_PER_CELL"]
@@ -558,5 +558,5 @@ def main() -> None:
         print(f"✅ VERIFICATION PASSED: All {total_params} parameters match")
 
 
-if __name__ ***REMOVED*** "__main__":
+if __name__ == "__main__":
     main()
