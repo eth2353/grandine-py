@@ -18,7 +18,6 @@ jobs:
 
       - uses: actions-rust-lang/audit@72c09e02f132669d52284a3323acdb503cfc1a24 # v1.2.7
         with:
-          workingDirectory: rust/grandine_bindings
           # RUSTSEC-2024-0388 - `derivative` unmaintained, used in Grandine
           # RUSTSEC-2024-0436 - `paste` unmaintained, used in bindings
           ignore: RUSTSEC-2024-0388,RUSTSEC-2024-0436
