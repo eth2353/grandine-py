@@ -3,8 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from grandine_py import ElectraSignedBeaconBlockMainnet
-from grandine_py.grandine_py import ElectraSignedBeaconBlockGnosis
+from grandine_py import ElectraSignedBeaconBlockMainnet, ElectraSignedBeaconBlockGnosis
 
 
 @pytest.mark.parametrize(
