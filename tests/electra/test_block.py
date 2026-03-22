@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import pytest
 
@@ -19,9 +18,12 @@ from grandine_py.grandine_py import ElectraSignedBeaconBlockGnosis
             ElectraSignedBeaconBlockGnosis,
             Path(__file__).parent / "fixtures/gnosis-26539000.ssz",
         ),
-    ]
+    ],
 )
-def test_ssz(block_cls: ElectraSignedBeaconBlockMainnet | ElectraSignedBeaconBlockGnosis, path_to_ssz: Path) -> None:
+def test_ssz(
+    block_cls: ElectraSignedBeaconBlockMainnet | ElectraSignedBeaconBlockGnosis,
+    path_to_ssz: Path,
+) -> None:
     with open(path_to_ssz, "rb") as f:
         encoded = f.read()
         decoded = block_cls.from_ssz(encoded)
@@ -39,9 +41,12 @@ def test_ssz(block_cls: ElectraSignedBeaconBlockMainnet | ElectraSignedBeaconBlo
             ElectraSignedBeaconBlockGnosis,
             Path(__file__).parent / "fixtures/gnosis-26539000.json",
         ),
-    ]
+    ],
 )
-def test_json(block_cls: ElectraSignedBeaconBlockMainnet | ElectraSignedBeaconBlockGnosis, path_to_json: Path) -> None:
+def test_json(
+    block_cls: ElectraSignedBeaconBlockMainnet | ElectraSignedBeaconBlockGnosis,
+    path_to_json: Path,
+) -> None:
     with open(path_to_json, "rb") as f:
         encoded = f.read()
         decoded = block_cls.from_json(encoded)
