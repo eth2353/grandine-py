@@ -17,16 +17,18 @@ use pyo3::prelude::*;
 
 use crate::Gnosis;
 use grandine_bls::SignatureBytes;
-use grandine_ssz::{ContiguousList, Ssz, SszHash, SszReadDefault};
+use grandine_builder_api::combined::SignedBuilderBid;
+use grandine_ssz::{ContiguousList, Ssz, SszHash, SszRead, SszReadDefault};
 use grandine_types::deneb::primitives::{Blob, KzgProof};
 use grandine_types::electra::containers::{
     BeaconBlock, BlindedBeaconBlock, SignedBeaconBlock, SignedBlindedBeaconBlock,
 };
+use grandine_types::nonstandard::Phase;
 use grandine_types::preset::{Mainnet, Minimal, Preset};
 use serde::{Deserialize, Serialize};
 
-// Bring the macro into scope (because it's #[macro_export], it's at crate root)
-use crate::define_ssz_pyclass_for_preset;
+// Bring the macros into scope (because they're #[macro_export], they're at crate root)
+use crate::{define_decodable_pyclass_for_preset, define_ssz_pyclass_for_preset};
 
 // =============================================================================
 // Helper traits and functions to reduce duplication between block types
@@ -135,6 +137,37 @@ fn format_hash_tree_root(root: &H256) -> String {
     format!("0x{}", hex::encode(root.as_bytes()))
 }
 
+fn blind_block_with_builder_bid<P: Preset>(
+    block: BeaconBlock<P>,
+    signed_builder_bid: &SignedBuilderBid<P>,
+) -> Result<BlindedBeaconBlock<P>, String> {
+    match signed_builder_bid {
+        SignedBuilderBid::Electra(signed_builder_bid) => Ok(block
+            .with_execution_payload_header_and_kzg_commitments(
+                (*signed_builder_bid.message.header).clone(),
+                Some(signed_builder_bid.message.blob_kzg_commitments.clone()),
+                Some(signed_builder_bid.message.execution_requests.clone()),
+            )),
+        _ => Err("SignedBuilderBid must be an Electra bid".to_owned()),
+    }
+}
+
+fn replace_blinded_block_builder_bid<P: Preset>(
+    mut block: BlindedBeaconBlock<P>,
+    signed_builder_bid: &SignedBuilderBid<P>,
+) -> Result<BlindedBeaconBlock<P>, String> {
+    match signed_builder_bid {
+        SignedBuilderBid::Electra(signed_builder_bid) => {
+            block.body.execution_payload_header = (*signed_builder_bid.message.header).clone();
+            block.body.blob_kzg_commitments =
+                signed_builder_bid.message.blob_kzg_commitments.clone();
+            block.body.execution_requests = signed_builder_bid.message.execution_requests.clone();
+            Ok(block)
+        }
+        _ => Err("SignedBuilderBid must be an Electra bid".to_owned()),
+    }
+}
+
 /// Block contents including the beacon block, KZG proofs, and blobs.
 ///
 /// This is used for the full block that includes blob data (Deneb/Electra).
@@ -162,16 +195,37 @@ paste! {
         SignedBeaconBlock<Mainnet>
     );
 
+    define_decodable_pyclass_for_preset!(
+        [<PySignedBuilderBidMainnet>],
+        "ElectraSignedBuilderBidMainnet",
+        SignedBuilderBid<Mainnet>,
+        ssz_decoder = |bytes: &[u8]| SignedBuilderBid::<Mainnet>::from_ssz(&Phase::Electra, bytes)
+    );
+
     define_ssz_pyclass_for_preset!(
         [<PySignedBeaconBlockMinimal>],
         "ElectraSignedBeaconBlockMinimal",
         SignedBeaconBlock<Minimal>
     );
 
+    define_decodable_pyclass_for_preset!(
+        [<PySignedBuilderBidMinimal>],
+        "ElectraSignedBuilderBidMinimal",
+        SignedBuilderBid<Minimal>,
+        ssz_decoder = |bytes: &[u8]| SignedBuilderBid::<Minimal>::from_ssz(&Phase::Electra, bytes)
+    );
+
     define_ssz_pyclass_for_preset!(
         [<PySignedBeaconBlockGnosis>],
         "ElectraSignedBeaconBlockGnosis",
         SignedBeaconBlock<Gnosis>
+    );
+
+    define_decodable_pyclass_for_preset!(
+        [<PySignedBuilderBidGnosis>],
+        "ElectraSignedBuilderBidGnosis",
+        SignedBuilderBid<Gnosis>,
+        ssz_decoder = |bytes: &[u8]| SignedBuilderBid::<Gnosis>::from_ssz(&Phase::Electra, bytes)
     );
 
     define_ssz_pyclass_for_preset!(
@@ -209,6 +263,19 @@ paste! {
                 py: pyo3::Python<'_>,
             ) -> String {
                 py.detach(|| format_hash_tree_root(&self.inner.block.hash_tree_root()))
+            }
+
+            pub fn replace_execution_payload_with_builder_bid(
+                &self,
+                signed_builder_bid: &[<PySignedBuilderBidMainnet>],
+            ) -> pyo3::PyResult<[<PyBlindedBeaconBlockMainnet>]> {
+                let blinded_block = blind_block_with_builder_bid(
+                    self.inner.block.clone(),
+                    &signed_builder_bid.inner,
+                )
+                .map_err(PyValueError::new_err)?;
+
+                Ok([<PyBlindedBeaconBlockMainnet>] { inner: blinded_block })
             }
         }
     );
@@ -249,6 +316,19 @@ paste! {
             ) -> String {
                 py.detach(|| format_hash_tree_root(&self.inner.block.hash_tree_root()))
             }
+
+            pub fn replace_execution_payload_with_builder_bid(
+                &self,
+                signed_builder_bid: &[<PySignedBuilderBidGnosis>],
+            ) -> pyo3::PyResult<[<PyBlindedBeaconBlockGnosis>]> {
+                let blinded_block = blind_block_with_builder_bid(
+                    self.inner.block.clone(),
+                    &signed_builder_bid.inner,
+                )
+                .map_err(PyValueError::new_err)?;
+
+                Ok([<PyBlindedBeaconBlockGnosis>] { inner: blinded_block })
+            }
         }
     );
 
@@ -287,6 +367,19 @@ paste! {
                 py: pyo3::Python<'_>,
             ) -> String {
                 py.detach(|| format_hash_tree_root(&self.inner.block.hash_tree_root()))
+            }
+
+            pub fn replace_execution_payload_with_builder_bid(
+                &self,
+                signed_builder_bid: &[<PySignedBuilderBidMinimal>],
+            ) -> pyo3::PyResult<[<PyBlindedBeaconBlockMinimal>]> {
+                let blinded_block = blind_block_with_builder_bid(
+                    self.inner.block.clone(),
+                    &signed_builder_bid.inner,
+                )
+                .map_err(PyValueError::new_err)?;
+
+                Ok([<PyBlindedBeaconBlockMinimal>] { inner: blinded_block })
             }
         }
     );
@@ -341,6 +434,19 @@ paste! {
             ) -> String {
                 py.detach(|| format_hash_tree_root(&self.inner.hash_tree_root()))
             }
+
+            pub fn replace_execution_payload_with_builder_bid(
+                &self,
+                signed_builder_bid: &[<PySignedBuilderBidMainnet>],
+            ) -> pyo3::PyResult<[<PyBlindedBeaconBlockMainnet>]> {
+                let blinded_block = replace_blinded_block_builder_bid(
+                    self.inner.clone(),
+                    &signed_builder_bid.inner,
+                )
+                .map_err(PyValueError::new_err)?;
+
+                Ok([<PyBlindedBeaconBlockMainnet>] { inner: blinded_block })
+            }
         }
     );
 
@@ -375,6 +481,19 @@ paste! {
                 py: pyo3::Python<'_>,
             ) -> String {
                 py.detach(|| format_hash_tree_root(&self.inner.hash_tree_root()))
+            }
+
+            pub fn replace_execution_payload_with_builder_bid(
+                &self,
+                signed_builder_bid: &[<PySignedBuilderBidGnosis>],
+            ) -> pyo3::PyResult<[<PyBlindedBeaconBlockGnosis>]> {
+                let blinded_block = replace_blinded_block_builder_bid(
+                    self.inner.clone(),
+                    &signed_builder_bid.inner,
+                )
+                .map_err(PyValueError::new_err)?;
+
+                Ok([<PyBlindedBeaconBlockGnosis>] { inner: blinded_block })
             }
         }
     );
@@ -411,6 +530,19 @@ paste! {
             ) -> String {
                 py.detach(|| format_hash_tree_root(&self.inner.hash_tree_root()))
             }
+
+            pub fn replace_execution_payload_with_builder_bid(
+                &self,
+                signed_builder_bid: &[<PySignedBuilderBidMinimal>],
+            ) -> pyo3::PyResult<[<PyBlindedBeaconBlockMinimal>]> {
+                let blinded_block = replace_blinded_block_builder_bid(
+                    self.inner.clone(),
+                    &signed_builder_bid.inner,
+                )
+                .map_err(PyValueError::new_err)?;
+
+                Ok([<PyBlindedBeaconBlockMinimal>] { inner: blinded_block })
+            }
         }
     );
     define_ssz_pyclass_for_preset!(
@@ -439,6 +571,7 @@ paste! {
 pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Mainnet classes
     m.add_class::<PySignedBeaconBlockMainnet>()?;
+    m.add_class::<PySignedBuilderBidMainnet>()?;
     m.add_class::<PyBeaconBlockContentsMainnet>()?;
     m.add_class::<PySignedBeaconBlockContentsMainnet>()?;
     m.add_class::<PyBlindedBeaconBlockMainnet>()?;
@@ -446,6 +579,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
 
     // Minimal classes
     m.add_class::<PySignedBeaconBlockMinimal>()?;
+    m.add_class::<PySignedBuilderBidMinimal>()?;
     m.add_class::<PyBeaconBlockContentsMinimal>()?;
     m.add_class::<PySignedBeaconBlockContentsMinimal>()?;
     m.add_class::<PyBlindedBeaconBlockMinimal>()?;
@@ -453,6 +587,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
 
     // Gnosis classes
     m.add_class::<PySignedBeaconBlockGnosis>()?;
+    m.add_class::<PySignedBuilderBidGnosis>()?;
     m.add_class::<PyBeaconBlockContentsGnosis>()?;
     m.add_class::<PySignedBeaconBlockContentsGnosis>()?;
     m.add_class::<PyBlindedBeaconBlockGnosis>()?;

@@ -1,0 +1,43 @@
+{
+  "data": {
+    "version": "electra",
+    "data": {
+      "message": {
+        "header": {
+          "parent_hash": "0x899863997bbc98b17f392bedaff4979724708fd0321e6aea5d9d0bd2efb70ee6",
+          "fee_recipient": "0x4838b106fce9647bdf1e7877bf73ce8b0bad5f97",
+          "state_root": "0xcf30ccc8a88214a6a29160c9ecdfb8e3bd7f96cca2b32a71dbba4da9392d425c",
+          "receipts_root": "0x28543469a5e0792dd26ff3b80572247ce05b7269a473d162d834d28cec62e6e7",
+          "logs_bloom": "0x75eff77fdfcff6d7ff7f7f75e5effcff7f5baf77ff7fbff37eb9bbd6fd33aceebfdbefbef7eebfe75bffffdffdf73f2f33bdff7eddffff3d7ff3fffdb7feefdbdedffdb83fdfebfffbbb796eede9ffbbd7fffe5ff77ffcfcfdf7f7ffdfeeb8df9fcffb38fbee6fe20dffdb9ddce3feebff7fe7eefebff6efffebfffcee9df67f9debd67a3f9e7f49bdffbfe3dfffdfa6ffbeefbffdf9f2dcfdf737d7fdbf6ebfbffff762def9b4cafff9fef7bfe70f7f67f6f7efb2fef3e73ffd5b2eb7bff8f7eefbdd6f27faead8fff7ed9e7ff96fdfabee76df7ffe2697fdebffbee7fefef77ffffe6b1f77f677effeebbfffef7fc3fdefdd2fb53e4ff6b7d6df3ff9fcf5af",
+          "prev_randao": "0x904ba625ba6174283b78ce7436a2dff63c8e446988d65bdc7bc1a29d04066aa6",
+          "block_number": "24914863",
+          "gas_limit": "60000000",
+          "gas_used": "44778167",
+          "timestamp": "1776612863",
+          "extra_data": "0x546974616e2028746974616e6275696c6465722e78797a29",
+          "base_fee_per_gas": "1434784828",
+          "block_hash": "0x38c9d2956b9e35c7c939ec5527b4d36c21dfbdd5ed4d23ee9a3660792cbc8aa6",
+          "transactions_root": "0x114d2dd2112f8c8c2174ed7bf695714cd58227cb56f243f2333f419689023e41",
+          "withdrawals_root": "0x27cabd0e9ceec2ace41b4a8bcfc44db66e2d12ff6830caaa3cbb314c9f67d519",
+          "blob_gas_used": "655360",
+          "excess_blob_gas": "211689239"
+        },
+        "blob_kzg_commitments": [
+          "0xb9522da8992a69d5bbcaa2b1dbadacfa6247b693975f9fc73db2c5193029a4d14049d72ff16882738ce880f407a9595b",
+          "0xb300c42d4938f71ddf32e9b241c82efc676bfae580d4e68bf325d687ebeed5fe25069b3505565677cd8520d44c6b057a",
+          "0x82b9c349c9ba8366a6b1d20ce626994e6bbfffe0b1a1ae52e57bed1885ba37dbcac4afc7c312656a3ba11f43f832bffc",
+          "0x83500de00fdc18fdc76e07163a72dba81161768ead233881095aaaf859e02fcdc34c8f7d209e7407503c759683af2ab7",
+          "0x85a2ae70c1a97205bca98556fc22b98280eac214abc0cd87a9fc1e0597ed07b3f52fa4547e0d5a64db69fbf451373217"
+        ],
+        "execution_requests": {
+          "deposits": [],
+          "withdrawals": [],
+          "consolidations": []
+        },
+        "value": "54778214863022513",
+        "pubkey": "0x8c4ed5e24fe5c6ae21018437bde147693f68cda427cd1122cf20819c30eda7ed74f72dece09bb313f2a1855595ab677d"
+      },
+      "signature": "0x8812ab4d1dbc7f8de775224ae5a6ad58a96889a24e7cf6d2624e9ab07379bd719f7edb2c92675a4ca0c9503290cda0ab06f6655c4bc8d29d0d6675025bcee0afa3b97ee099452010035074392c546f87c3a38aca76c032672acf56528b7770a1"
+    }
+  }
+}

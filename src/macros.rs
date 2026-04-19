@@ -5,6 +5,12 @@
 //! Ethereum presets (Mainnet, Minimal, Gnosis).
 
 use grandine_ssz::{SszRead, SszReadDefault as _, SszWrite};
+use serde::Deserialize;
+
+#[derive(Deserialize)]
+pub struct JsonDataEnvelope<T> {
+    pub data: T,
+}
 
 /// Decodes SSZ-encoded bytes into a type.
 ///
@@ -97,13 +103,8 @@ macro_rules! define_ssz_pyclass_for_preset {
             where
                 $rust_ty: serde::de::DeserializeOwned,
             {
-                #[derive(serde::Deserialize)]
-                struct Envelope<T> {
-                    data: T,
-                }
-
                 let bytes = b.as_bytes().to_vec();
-                let env: Envelope<$rust_ty> = py
+                let env: $crate::JsonDataEnvelope<$rust_ty> = py
                     .detach(|| serde_json::from_slice(&bytes))
                     .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
 
@@ -141,6 +142,59 @@ macro_rules! define_ssz_pyclass_for_preset {
                     .detach(|| serde_json::to_vec(inner_ref))
                     .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
                 Ok(pyo3::types::PyBytes::new(py, &out).into())
+            }
+
+            $($($extra)*)?
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! define_decodable_pyclass_for_preset {
+    (
+        $rust_struct:ident,
+        $py_name:literal,
+        $rust_ty:ty,
+        ssz_decoder = $ssz_decoder:expr
+        $(, extra_methods = { $($extra:tt)* } )?
+    ) => {
+        #[pyo3::prelude::pyclass(name = $py_name)]
+        pub struct $rust_struct {
+            pub(crate) inner: $rust_ty,
+        }
+
+        #[pyo3::prelude::pymethods]
+        impl $rust_struct {
+            #[staticmethod]
+            /// Deserialize from SSZ-encoded bytes.
+            ///
+            /// # Errors
+            /// Returns `PyValueError` if deserialization fails.
+            pub fn from_ssz(
+                py: pyo3::Python<'_>,
+                b: &pyo3::Bound<'_, pyo3::types::PyBytes>,
+            ) -> pyo3::PyResult<Self> {
+                let bytes = b.as_bytes().to_vec();
+                let inner: $rust_ty = py
+                    .detach(|| ($ssz_decoder)(&bytes))
+                    .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+                Ok(Self { inner })
+            }
+
+            #[staticmethod]
+            /// Deserialize from JSON-encoded bytes.
+            ///
+            /// # Errors
+            /// Returns `PyValueError` if deserialization fails.
+            pub fn from_json(
+                py: pyo3::Python<'_>,
+                b: &pyo3::Bound<'_, pyo3::types::PyBytes>,
+            ) -> pyo3::PyResult<Self> {
+                let bytes = b.as_bytes().to_vec();
+                let env: $crate::JsonDataEnvelope<$rust_ty> = py
+                    .detach(|| serde_json::from_slice(&bytes))
+                    .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+                Ok(Self { inner: env.data })
             }
 
             $($($extra)*)?

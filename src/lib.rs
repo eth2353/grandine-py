@@ -27,7 +27,7 @@ mod electra;
 mod macros;
 mod preset_gnosis;
 
-pub use macros::{decode_ssz, encode_ssz};
+pub use macros::{decode_ssz, encode_ssz, JsonDataEnvelope};
 pub use preset_gnosis::Gnosis;
 
 #[pymodule]
