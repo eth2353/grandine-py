@@ -99,3 +99,8 @@ type ElectraBlindedBeaconBlockType = (
     | ElectraBlindedBeaconBlockGnosis
     | ElectraBlindedBeaconBlockMinimal
 )
+type ElectraSignedBuilderBidType = (
+    ElectraSignedBuilderBidMainnet
+    | ElectraSignedBuilderBidGnosis
+    | ElectraSignedBuilderBidMinimal
+)
