@@ -79,7 +79,7 @@ def test_replace_execution_payload_with_builder_bid_blinds_block_contents(
     )
 
     builder_bid = ElectraSignedBuilderBidMainnet.from_json(
-        json.dumps({"data": builder_bid_json}).encode()
+        json.dumps(builder_bid_json).encode()
     )
     blinded_block = block_contents.replace_execution_payload_with_builder_bid(
         builder_bid
@@ -115,7 +115,7 @@ def test_replace_execution_payload_with_builder_bid_updates_blinded_block(
     original_blinded_body = signed_blinded_block["data"]["message"]["body"]
 
     builder_bid = ElectraSignedBuilderBidMinimal.from_json(
-        json.dumps({"data": builder_bid_json}).encode()
+        json.dumps(builder_bid_json).encode()
     )
     blinded_block = block.replace_execution_payload_with_builder_bid(builder_bid)
     blinded_json = json.loads(blinded_block.to_json().decode())

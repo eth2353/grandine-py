@@ -191,10 +191,10 @@ macro_rules! define_decodable_pyclass_for_preset {
                 b: &pyo3::Bound<'_, pyo3::types::PyBytes>,
             ) -> pyo3::PyResult<Self> {
                 let bytes = b.as_bytes().to_vec();
-                let env: $crate::JsonDataEnvelope<$rust_ty> = py
+                let inner: $rust_ty = py
                     .detach(|| serde_json::from_slice(&bytes))
                     .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
-                Ok(Self { inner: env.data })
+                Ok(Self { inner })
             }
 
             $($($extra)*)?
